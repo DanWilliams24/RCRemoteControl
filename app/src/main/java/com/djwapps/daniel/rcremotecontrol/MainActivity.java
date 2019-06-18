@@ -6,10 +6,13 @@ import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton startButton;
     private Button settingsButton,leftButton,rightButton,upButton,downButton;
     private boolean connectionEstablished;
+    private TextView ipView;
     private String ip;
 
 
@@ -37,15 +41,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         rightButton = findViewById(R.id.rightButton);
         upButton = findViewById(R.id.upButton);
         downButton = findViewById(R.id.downButton);
+        ipView = findViewById(R.id.ipView);
+
+        startButton.setOnClickListener(this);
+        settingsButton.setOnClickListener(this);
+        leftButton.setOnClickListener(this);
+        rightButton.setOnClickListener(this);
+        upButton.setOnClickListener(this);
+        downButton.setOnClickListener(this);
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+        ipView.setText(ip);
 
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.startButton: startConnection();
+            case R.id.startButton:
+                startConnection();
                 break;
-            case R.id.settingsButton: openSettingsMenu();
+            case R.id.settingsButton:
+                openSettingsMenu();
                 break;
             case R.id.upButton: streamCommand(COMMAND.UP);
                 break;
@@ -65,18 +84,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void openSettingsMenu(){
-        AlertDialog.Builder helpBuilder = new AlertDialog.Builder(this);
+        Log.d("networktests", "Open Settings");
+        AlertDialog.Builder helpBuilder = new AlertDialog.Builder(MainActivity.this);
         helpBuilder.setTitle("IP Settings");
         helpBuilder.setMessage("Set the LAN Address of RC");
         final EditText input = new EditText(this);
         input.setSingleLine();
         input.setText("");
+        helpBuilder.setView(input);
+
         helpBuilder.setPositiveButton("Update",
                 new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialog, int which) {
                         // Do nothing but close the dialog
-                        ip = input.getText().toString();
+                        setIp(input.getText().toString());
 
                     }
                 });
@@ -98,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //This will open a socket, send the command, then close the socket
     public void streamCommand(final COMMAND command){
+        Log.d("networktests", "ATTEMPTING TO STREAM COMMAND");
         if(connectionEstablished){
             Thread thread = new Thread(new Runnable() {
                 @Override
@@ -117,13 +140,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         output.close();
                         out.close();
                         s.close();
+                        Log.d("networktests", "DATASTREAM SUCCESSFUL");
                     } catch (IOException e) {
                         e.printStackTrace();
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast.makeText(getApplicationContext(),"Network Error Occurred",Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 }
             });
 
             thread.start();
+        }else{
+            Toast.makeText(getApplicationContext(),"Connection Has Not Been Established Yet",Toast.LENGTH_SHORT).show();
         }
     }
 
