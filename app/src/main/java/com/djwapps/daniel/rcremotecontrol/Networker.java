@@ -14,17 +14,30 @@ public class Networker {
     private boolean connected = false;
     private Socket sock;
     private DataOutputStream dataOut;
+    private Thread worker1;
+    private Thread worker2;
+    public String command;
 
     //constructor: establishes connection
     public Networker(String ip, int port) {
         this.ip = ip;
         this.port = port;
-        try {
+        worker1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                    startOnThread();
+            }
+        });
+        worker1.start();
+    }
+
+    private void startOnThread(){
+        try{
             sock = new Socket(ip, port);
             dataOut = new DataOutputStream(this.sock.getOutputStream());
             connected = true;
-
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
 
         }
@@ -43,21 +56,38 @@ public class Networker {
     //sends string encoded with UTF-8
     public void send(String command){
         Log.d("RC-NET", "Attempting to send Command: " + command);
+        this.command = command;
+        worker2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sendOnThread();
+
+            }
+        });
+        worker2.start();
+
+    }
+
+    private void sendOnThread(){
         if(isConnected()){
             try {
 
-                dataOut.writeUTF(command);
+                dataOut.writeUTF(this.command);
                 dataOut.flush();
-                Log.d("RC-NET", "Message Sent: " + command);
+                Log.d("RC-NET", "Message Sent: " + this.command);
             }
             catch (IOException e) {
                 e.printStackTrace();
             }
-        }else{
+        }
+        else{
             //Throw an error so that MainActivity can catch it and inform the user of the problem
             throw new IllegalStateException("Connection to server must be established before communications take place.");
         }
     }
+
+
+
 
     //closes connection
     public void close(){
