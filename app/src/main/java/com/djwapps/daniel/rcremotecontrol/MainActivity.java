@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button settingsButton,leftButton,rightButton,upButton,downButton;
     private TextView ipView;
     private String ip;
+    private Boolean networkerEstablished = false;
     private Networker networker;
 
     public enum COMMAND {
@@ -49,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         rightButton.setOnClickListener(this);
         upButton.setOnClickListener(this);
         downButton.setOnClickListener(this);
+
+
     }
 
     public void setIp(String ip) {
@@ -67,22 +70,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 openSettingsMenu();
                 break;
             case R.id.upButton:
-                Log.d("RC-UI", "UP Button Pressed");
-                attemptToSend("" + COMMAND.UP.name().charAt(0));
+                if(networkerEstablished){
+                    Log.d("RC-UI", "UP Button Pressed");
+                    attemptToSend("" + COMMAND.UP.name().charAt(0));
+                }else{
+                    Toast.makeText(getApplicationContext(),"This device is not yet connected to the RC",Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.downButton:
-                Log.d("RC-UI", "DOWN Button Pressed");
-                attemptToSend("" + COMMAND.DOWN.name().charAt(0));
+                if(networkerEstablished){
+                    Log.d("RC-UI", "DOWN Button Pressed");
+                    attemptToSend("" + COMMAND.DOWN.name().charAt(0));
+                }else{
+                    Toast.makeText(getApplicationContext(),"This device is not yet connected to the RC",Toast.LENGTH_SHORT).show();
+                }
+
                 break;
             case R.id.leftButton:
-                Log.d("RC-UI", "LEFT Button Pressed");
-                attemptToSend("" + COMMAND.LEFT.name().charAt(0));
+                if(networkerEstablished){
+                    Log.d("RC-UI", "LEFT Button Pressed");
+                    attemptToSend("" + COMMAND.LEFT.name().charAt(0));
+                }else{
+                    Toast.makeText(getApplicationContext(),"This device is not yet connected to the RC",Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.rightButton:
-                Log.d("RC-UI", "RIGHT Button Pressed");
-                attemptToSend("" + COMMAND.RIGHT.name().charAt(0));
+                if(networkerEstablished){
+                    Log.d("RC-UI", "RIGHT Button Pressed");
+                    attemptToSend("" + COMMAND.RIGHT.name().charAt(0));
+                }else{
+                    Toast.makeText(getApplicationContext(),"This device is not yet connected to the RC",Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
+
     }
 
 
@@ -98,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d("RC-UI", "Attempting to Connect");
         settingsButton.setEnabled(false);
         networker = new Networker(ip);
-
+        networkerEstablished = true;
     }
 
 
