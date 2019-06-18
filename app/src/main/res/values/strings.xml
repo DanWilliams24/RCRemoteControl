@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">RCRemoteControl</string>
+    <string name="up">▲</string>
+    <string name="down">▼</string>
+    <string name="left">◀</string>
+    <string name="right">▶</string>
+    <string name="stop">✺</string>
 </resources>
