@@ -23,14 +23,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private ImageButton startButton;
     private Button settingsButton,leftButton,rightButton,upButton,downButton;
-    private boolean connectionEstablished;
     private TextView ipView;
     private String ip;
-
+    private Networker networker;
 
     public enum COMMAND {
         LEFT,RIGHT,UP,DOWN
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,25 +66,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.settingsButton:
                 openSettingsMenu();
                 break;
-            case R.id.upButton: streamCommand(COMMAND.UP);
+            case R.id.upButton:
+                Log.d("RC-UI", "UP Button Pressed");
+                attemptToSend("" + COMMAND.UP.name().charAt(0));
                 break;
-            case R.id.downButton:streamCommand(COMMAND.DOWN);
+            case R.id.downButton:
+                Log.d("RC-UI", "DOWN Button Pressed");
+                attemptToSend("" + COMMAND.DOWN.name().charAt(0));
                 break;
-            case R.id.leftButton:streamCommand(COMMAND.LEFT);
+            case R.id.leftButton:
+                Log.d("RC-UI", "LEFT Button Pressed");
+                attemptToSend("" + COMMAND.LEFT.name().charAt(0));
                 break;
-            case R.id.rightButton:streamCommand(COMMAND.RIGHT);
+            case R.id.rightButton:
+                Log.d("RC-UI", "RIGHT Button Pressed");
+                attemptToSend("" + COMMAND.RIGHT.name().charAt(0));
                 break;
         }
     }
 
+
+    private void attemptToSend(String data){
+        try {
+            networker.send(data);
+        }catch (IllegalStateException e){
+            Toast.makeText(getApplicationContext(),"Error: " + e.getMessage(),Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void startConnection(){
-        connectionEstablished = true;
+        Log.d("RC-UI", "Attempting to Connect");
+        settingsButton.setEnabled(false);
+        networker = new Networker(ip);
+
     }
 
 
 
     private void openSettingsMenu(){
-        Log.d("networktests", "Open Settings");
+        Log.d("RC-UI", "Opening Settings");
         AlertDialog.Builder helpBuilder = new AlertDialog.Builder(MainActivity.this);
         helpBuilder.setTitle("IP Settings");
         helpBuilder.setMessage("Set the LAN Address of RC");
@@ -118,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
-    
+/*
     //This will open a socket, send the command, then close the socket
     public void streamCommand(final COMMAND command){
         Log.d("networktests", "ATTEMPTING TO STREAM COMMAND");
@@ -158,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(getApplicationContext(),"Connection Has Not Been Established Yet",Toast.LENGTH_SHORT).show();
         }
     }
-
+*/
 
 
 }
