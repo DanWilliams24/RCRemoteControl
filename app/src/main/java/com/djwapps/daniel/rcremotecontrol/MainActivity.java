@@ -18,14 +18,14 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageButton startButton;
-    private Button settingsButton,leftButton,rightButton,upButton,downButton;
+    private Button settingsButton,leftButton,rightButton,upButton,downButton,stopButton;
     private TextView ipView;
     private String ip;
     private Boolean networkerEstablished = false;
     private Networker networker;
 
     public enum COMMAND {
-        LEFT,RIGHT,UP,DOWN
+        LEFT,RIGHT,UP,DOWN,STOP
     }
 
     @Override
@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         upButton = findViewById(R.id.upButton);
         downButton = findViewById(R.id.downButton);
         ipView = findViewById(R.id.ipView);
+        stopButton = findViewById(R.id.stopButton);
         ip = "255.255.255.255";
         startButton.setOnClickListener(this);
         settingsButton.setOnClickListener(this);
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         rightButton.setOnClickListener(this);
         upButton.setOnClickListener(this);
         downButton.setOnClickListener(this);
+        stopButton.setOnClickListener(this);
 
 
     }
@@ -98,6 +100,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(getApplicationContext(),"This device is not yet connected to the RC",Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case R.id.stopButton:
+                if(networkerEstablished){
+                    Log.d("RC-UI", "STOP Button Pressed");
+                    attemptToSend("" + COMMAND.STOP.name().charAt(0));
+                }else{
+                    Toast.makeText(getApplicationContext(),"This device is not yet connected to the RC",Toast.LENGTH_SHORT).show();
+                }
+
         }
 
     }
