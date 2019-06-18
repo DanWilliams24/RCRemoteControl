@@ -2,7 +2,6 @@ package com.djwapps.daniel.rcremotecontrol;
 
 
 import android.util.Log;
-
 import java.io.IOException;
 import java.io.DataOutputStream;
 import java.net.Socket;
