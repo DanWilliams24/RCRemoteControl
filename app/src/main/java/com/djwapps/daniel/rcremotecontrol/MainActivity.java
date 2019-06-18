@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         upButton = findViewById(R.id.upButton);
         downButton = findViewById(R.id.downButton);
         ipView = findViewById(R.id.ipView);
-
+        ip = "255.255.255.255";
         startButton.setOnClickListener(this);
         settingsButton.setOnClickListener(this);
         leftButton.setOnClickListener(this);
@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final EditText input = new EditText(this);
         input.setSingleLine();
         input.setText("");
+        input.setHint(ip);
         helpBuilder.setView(input);
 
         helpBuilder.setPositiveButton("Update",
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
-
+    
     //This will open a socket, send the command, then close the socket
     public void streamCommand(final COMMAND command){
         Log.d("networktests", "ATTEMPTING TO STREAM COMMAND");
