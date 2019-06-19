@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         downButton.setOnClickListener(this);
         stopButton.setOnClickListener(this);
 
-
     }
 
     public void setIp(String ip) {
@@ -62,7 +61,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.startButton:
-                startConnection();
+                if(networkerEstablished && networker.isConnected()){
+                    endConnection();
+                }else{
+                    startConnection();
+                }
                 break;
             case R.id.settingsButton:
                 openSettingsMenu();
@@ -128,6 +131,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         networkerEstablished = true;
     }
 
+
+    public void endConnection(){
+        Log.d("RC-UI", "Proceeding to End Connection");
+        networker.close();
+    }
 
 
     private void openSettingsMenu(){

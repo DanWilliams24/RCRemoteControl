@@ -37,6 +37,11 @@ public class Networker {
         worker1.start();
     }
 
+    //overloaded for default case
+    public Networker(String ip) {
+        this(ip, 6666);
+    }
+
     private void startOnThread(){
         try{
             sock = new Socket(ip, port);
@@ -47,11 +52,6 @@ public class Networker {
             e.printStackTrace();
 
         }
-    }
-
-    //overloaded for default case
-    public Networker(String ip) {
-        this(ip, 6666);
     }
 
     //accessor method: returns true if connection is established
@@ -88,7 +88,7 @@ public class Networker {
 
 
 
-    //closes connection
+    //closes connection. A new instance of the Networker class will have to be created to start a new connection.
     public void close(){
         Log.d("RC-NET", "Closing Connection");
         try {
@@ -99,6 +99,7 @@ public class Networker {
         catch(IOException e){
             e.printStackTrace();
         }
+
     }
 
 
