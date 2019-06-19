@@ -14,7 +14,14 @@ public class Networker {
     private Socket sock;
     private DataOutputStream dataOut;
     private Thread worker1;
-    private Thread worker2;
+    private Thread worker2 = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            sendOnThread();
+
+        }
+    });
+
     public String command;
 
     //constructor: establishes connection
@@ -56,13 +63,6 @@ public class Networker {
     public void send(String command){
         Log.d("RC-NET", "Attempting to send Command: " + command);
         this.command = command;
-        worker2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                sendOnThread();
-
-            }
-        });
         worker2.start();
 
     }

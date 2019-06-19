@@ -165,47 +165,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
-/*
-    //This will open a socket, send the command, then close the socket
-    public void streamCommand(final COMMAND command){
-        Log.d("networktests", "ATTEMPTING TO STREAM COMMAND");
-        if(connectionEstablished){
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-
-                    try {
-                        //Replace below IP with the IP of that device in which server socket open.
-                        //If you change port then change the port number in the server side code also.
-                        Socket s = new Socket(ip, 6666);
-
-                        OutputStream out = s.getOutputStream();
-
-                        PrintWriter output = new PrintWriter(out);
-
-                        output.println(command.name().charAt(0));
-                        output.flush();
-                        output.close();
-                        out.close();
-                        s.close();
-                        Log.d("networktests", "DATASTREAM SUCCESSFUL");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        MainActivity.this.runOnUiThread(new Runnable() {
-                            public void run() {
-                                Toast.makeText(getApplicationContext(),"Network Error Occurred",Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                }
-            });
-
-            thread.start();
-        }else{
-            Toast.makeText(getApplicationContext(),"Connection Has Not Been Established Yet",Toast.LENGTH_SHORT).show();
-        }
-    }
-*/
-
 
 }
