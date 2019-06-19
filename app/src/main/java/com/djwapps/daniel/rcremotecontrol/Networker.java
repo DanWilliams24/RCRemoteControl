@@ -42,7 +42,7 @@ public class Networker {
         this(ip, 6666);
     }
 
-    private void startOnThread(){
+    private void startOnThread() {
         try{
             sock = new Socket(ip, port);
             dataOut = new DataOutputStream(this.sock.getOutputStream());
@@ -50,7 +50,7 @@ public class Networker {
         }
         catch (IOException e) {
             e.printStackTrace();
-
+            connected = false;
         }
     }
 
@@ -77,11 +77,9 @@ public class Networker {
             }
             catch (IOException e) {
                 e.printStackTrace();
+                Log.d("RC-NET", "Message was not able to send: " + this.command);
+
             }
-        }
-        else{
-            //Throw an error so that MainActivity can catch it and inform the user of the problem
-            throw new IllegalStateException("Connection to server must be established before communications take place.");
         }
     }
 
