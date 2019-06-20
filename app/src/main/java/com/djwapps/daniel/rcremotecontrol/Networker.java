@@ -5,24 +5,26 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.lang.Thread;
 
 public class Networker {
 
     public final String ip;
     public final int port;
+    public String command;
+    private String lastMsg = "";
     private boolean connected = false;
     private Socket sock;
     private DataOutputStream dataOut;
     private Thread worker1;
-    private Thread worker2 = new Thread(new Runnable() {
+
+
+    private Thread sender = new Thread(new Runnable() {
         @Override
         public void run() {
-            sendOnThread();
-
+            senderThread();
         }
     });
-
-    public String command;
 
     //constructor: establishes connection
     public Networker(String ip, int port) {
@@ -31,7 +33,7 @@ public class Networker {
         worker1 = new Thread(new Runnable() {
             @Override
             public void run() {
-                    startOnThread();
+                createSocket();
             }
         });
         worker1.start();
@@ -42,11 +44,11 @@ public class Networker {
         this(ip, 6666);
     }
 
-    private void startOnThread() {
+    private void createSocket() {
         try{
             sock = new Socket(ip, port);
+            this.connected = true;
             dataOut = new DataOutputStream(this.sock.getOutputStream());
-            connected = true;
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -56,34 +58,40 @@ public class Networker {
 
     //accessor method: returns true if connection is established
     public boolean isConnected() {
-        return (connected);
+        return (this.connected);
     }
 
     //sends string encoded with UTF-8
     public void send(String command){
         Log.d("RC-NET", "Attempting to send Command: " + command);
         this.command = command;
-        worker2.start();
 
     }
 
-    private void sendOnThread(){
-        if(isConnected()){
-            try {
 
-                dataOut.writeUTF(this.command);
-                dataOut.flush();
-                Log.d("RC-NET", "Message Sent: " + this.command);
-            }
-            catch (IOException e) {
+    private void senderThread() {
+        while (true) {
+            try {
+                if (this.command != this.lastMsg) {
+                    this.lastMsg = this.command;
+                    Log.d("RC-NET", "Message about to send" + this.command);
+                    dataOut.writeUTF(this.command);
+                    dataOut.flush();
+                    Log.d("RC-NET", "Message Sent: " + this.command);
+
+                }
+                Thread.sleep(200);
+
+            } catch (IOException e) {
                 e.printStackTrace();
                 Log.d("RC-NET", "Message was not able to send: " + this.command);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Log.d("RC-NET", "Thread failed to stop");
 
             }
         }
     }
-
-
 
 
     //closes connection. A new instance of the Networker class will have to be created to start a new connection.
