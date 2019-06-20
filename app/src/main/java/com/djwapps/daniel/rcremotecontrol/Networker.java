@@ -2,6 +2,8 @@ package com.djwapps.daniel.rcremotecontrol;
 
 
 import android.util.Log;
+
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.DataOutputStream;
 import java.net.Socket;
@@ -12,14 +14,17 @@ public class Networker {
     public final String ip;
     public final int port;
     public String command;
+    public String rMessage;
     private boolean threadEst;
     private String lastMsg = "";
     private boolean connected = false;
     private boolean stopThread = false;
     private Socket sock;
+    private DataInputStream datain;
     private DataOutputStream dataOut;
     private Thread worker1;
     private Thread sender;
+    private Thread listener;
 
 
     //constructor: establishes connection
@@ -51,10 +56,17 @@ public class Networker {
             sock = new Socket(ip, port);
             this.connected = true;
             dataOut = new DataOutputStream(this.sock.getOutputStream());
+            datain = new DataInputStream(this.sock.getInputStream());
             sender = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     senderThread();
+                }
+            });
+            listener = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    listenerThread();
                 }
             });
         }
@@ -73,6 +85,7 @@ public class Networker {
     public void send(String command){
         if (!threadEst) {
             threadEst = true;
+            listener.start();
             sender.start();
         }
         Log.d("RC-NET", "Attempting to send Command: " + command);
@@ -106,6 +119,26 @@ public class Networker {
 
             }
         }
+    }
+
+
+    private void listenerThread() {
+        while (true) {
+            try {
+                this.rMessage = datain.readUTF();
+                Log.d("RC-NET", "Msg Received! " + this.rMessage);
+                Thread.sleep(100);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.d("RC-NET", "Msg not received");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Log.d("RC-NET", "Thread failed to stop");
+
+            }
+        }
+
     }
 
 
