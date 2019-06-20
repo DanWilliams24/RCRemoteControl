@@ -15,6 +15,7 @@ public class Networker {
     private boolean threadEst;
     private String lastMsg = "";
     private boolean connected = false;
+    private boolean stopThread = false;
     private Socket sock;
     private DataOutputStream dataOut;
     private Thread worker1;
@@ -91,8 +92,10 @@ public class Networker {
                     this.dataOut.flush();
                     Log.d("RC-NET", "Message Sent: " + this.command);
 
+                } else if (stopThread) {
+                    break;
                 }
-                Thread.sleep(200);
+                Thread.sleep(100);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -112,6 +115,7 @@ public class Networker {
         try {
             this.dataOut.close();
             this.sock.close();
+            this.stopThread = true;
             Log.d("RC-NET", "Connection Closed");
         }
         catch(IOException e){
