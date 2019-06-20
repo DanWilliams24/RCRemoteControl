@@ -137,12 +137,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             attemptToSend("" + COMMAND.DOWN.name().charAt(0));
         }
 
-
-        if(networkerEstablished && event.getAction() == MotionEvent.ACTION_UP){
-            if(v.getId() == R.id.leftButton || v.getId() == R.id.rightButton | v.getId() == R.id.upButton | v.getId() == R.id.downButton){
-                attemptToSend("" + COMMAND.STOP.name().charAt(0));
-            }
-        }
         if((event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_UP) && !networkerEstablished){
             notificationBanner.show();
         }
@@ -166,6 +160,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.settingsButton:
                 openSettingsMenu();
                 break;
+        }
+
+        if(v.getId() == R.id.leftButton || v.getId() == R.id.rightButton || v.getId() == R.id.upButton || v.getId() == R.id.downButton){
+            attemptToSend("" + COMMAND.STOP.name().charAt(0));
         }
 
     }
