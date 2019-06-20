@@ -12,19 +12,14 @@ public class Networker {
     public final String ip;
     public final int port;
     public String command;
+    private boolean threadEst;
     private String lastMsg = "";
     private boolean connected = false;
     private Socket sock;
     private DataOutputStream dataOut;
     private Thread worker1;
+    private Thread sender;
 
-
-    private Thread sender = new Thread(new Runnable() {
-        @Override
-        public void run() {
-            senderThread();
-        }
-    });
 
     //constructor: establishes connection
     public Networker(String ip, int port) {
@@ -34,6 +29,12 @@ public class Networker {
             @Override
             public void run() {
                 createSocket();
+            }
+        });
+        sender = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                senderThread();
             }
         });
         worker1.start();
@@ -49,6 +50,12 @@ public class Networker {
             sock = new Socket(ip, port);
             this.connected = true;
             dataOut = new DataOutputStream(this.sock.getOutputStream());
+            sender = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    senderThread();
+                }
+            });
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -63,6 +70,10 @@ public class Networker {
 
     //sends string encoded with UTF-8
     public void send(String command){
+        if (!threadEst) {
+            threadEst = true;
+            sender.start();
+        }
         Log.d("RC-NET", "Attempting to send Command: " + command);
         this.command = command;
 
@@ -70,13 +81,14 @@ public class Networker {
 
 
     private void senderThread() {
+        this.lastMsg = "S";
         while (true) {
             try {
                 if (this.command != this.lastMsg) {
                     this.lastMsg = this.command;
                     Log.d("RC-NET", "Message about to send" + this.command);
-                    dataOut.writeUTF(this.command);
-                    dataOut.flush();
+                    this.dataOut.writeUTF(this.command);
+                    this.dataOut.flush();
                     Log.d("RC-NET", "Message Sent: " + this.command);
 
                 }
