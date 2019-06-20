@@ -1,6 +1,9 @@
 package com.djwapps.daniel.rcremotecontrol;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
+import android.os.PersistableBundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,12 +26,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Boolean networkerEstablished = false;
     private Networker networker;
     private Toast notificationBanner;
+    private WorkerFragment mWorkerFragment,mRetainedFragment;
+
 
     public enum COMMAND {
         LEFT,RIGHT,UP,DOWN,STOP
     }
 
 
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+
+        outState.putString("ip", ip);
+        outState.putBoolean("networkerEstablished", networkerEstablished);
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+
+        this.ip = savedInstanceState.getString("ip");
+        this.networkerEstablished = savedInstanceState.getBoolean("networkerEstablished");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +71,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         rightButton.setOnTouchListener(this);
         upButton.setOnTouchListener(this);
         downButton.setOnTouchListener(this);
+
+
+        leftButton.setOnClickListener(this);
+        rightButton.setOnClickListener(this);
+        upButton.setOnClickListener(this);
+        downButton.setOnClickListener(this);
+
+
         notificationBanner = Toast.makeText(getApplicationContext(),"This device is not yet connected to the RC",Toast.LENGTH_SHORT);
 
 
         startButton.setColorFilter(getResources().getColor(R.color.offColor));
+
+        // find the retained fragment on activity restarts
+        FragmentManager fm = getFragmentManager();
+        mWorkerFragment = (WorkerFragment) fm.findFragmentByTag("worker_fragment");
+
+        // create the fragment and data the first time
+        if (mWorkerFragment == null) {
+            // add the fragment
+            mWorkerFragment = new WorkerFragment();
+            fm.beginTransaction().add(mWorkerFragment, "worker_fragment").commit();
+            // load data from a data source or perform any calculation
+            mWorkerFragment.setDataObject(networker);
+        }
+
+        networker = mWorkerFragment.getDataObject();
+
+
+
+        // the data is available in mRetainedFragment.getData() even after
+        // subsequent configuration change restarts.
     }
 
     public void setIp(String ip) {
@@ -142,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void startConnection(){
         Log.d("RC-NETUI", "Attempting to Connect");
         networker = new Networker(ip);
+        android.os.SystemClock.sleep(5);
         if(networker.isConnected()){
             networkerEstablished = true;
             settingsButton.setEnabled(false);
