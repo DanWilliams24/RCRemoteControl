@@ -136,6 +136,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d("RC-UI", "DOWN Button Pressed");
             attemptToSend("" + COMMAND.DOWN.name().charAt(0));
         }
+        if(networkerEstablished && event.getAction()== MotionEvent.ACTION_UP){
+            attemptToSend("" + COMMAND.STOP.name().charAt(0));
+        }
 
         if((event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_UP) && !networkerEstablished){
             notificationBanner.show();
@@ -162,9 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
 
-        if(v.getId() == R.id.leftButton || v.getId() == R.id.rightButton || v.getId() == R.id.upButton || v.getId() == R.id.downButton){
-            attemptToSend("" + COMMAND.STOP.name().charAt(0));
-        }
+        
 
     }
 
@@ -190,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void startConnection(){
         Log.d("RC-NETUI", "Attempting to Connect");
         networker = new Networker(ip);
-        android.os.SystemClock.sleep(5);
+        android.os.SystemClock.sleep(2000);
         if(networker.isConnected()){
             networkerEstablished = true;
             settingsButton.setEnabled(false);
